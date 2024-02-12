@@ -1,4 +1,4 @@
-# JSON Data Exchange
+# Jdex
 
 Jdex is a JSON file-system database with server and client components.
 

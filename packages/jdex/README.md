@@ -1,4 +1,4 @@
-# JSON Data Exchange
+# Jdex
 
 Jdex is a JSON file-system database with separate client/server libraries and
 this is the package which is planned to contain any shared bits.

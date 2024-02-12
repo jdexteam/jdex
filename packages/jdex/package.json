@@ -1,7 +1,7 @@
 {
   "name": "jdex",
-  "version": "0.0.1",
-  "description": "JSON Data Exchange core types and scripts.",
+  "version": "0.0.2",
+  "description": "Jdex core types and scripts.",
   "license": "MIT",
   "homepage": "https://github.com/jdexteam/jdex",
   "bugs": {
