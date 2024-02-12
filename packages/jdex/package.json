@@ -1,0 +1,30 @@
+{
+  "name": "jdex",
+  "version": "0.0.1",
+  "description": "JSON Data Exchange core types and scripts.",
+  "license": "MIT",
+  "homepage": "https://github.com/jdexteam/jdex",
+  "bugs": {
+    "url": "https://github.com/jdexteam/jdex/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdexteam/jdex.git"
+  },
+  "keywords": [
+    "json",
+    "database",
+    "db",
+    "filesystem",
+    "fs"
+  ],
+  "main": "",
+  "types": "types/index.d.ts",
+  "files": [
+    "README.md",
+    "types"
+  ],
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {}
+}
