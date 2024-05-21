@@ -1,0 +1,66 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": "./"
+    },
+    {
+      "name": "packages/jdex",
+      "path": "packages/jdex"
+    },
+    {
+      "name": "packages/server",
+      "path": "packages/server"
+    },
+    {
+      "name": "packages/client",
+      "path": "packages/client"
+    },
+  ],
+  // Settings to apply when VS Code is started with this `.code-workspace`
+  // file. Each of the workspace folders above can ALSO have their own
+  // settings in a `.vscode/` subdirectory. Those settings are applied
+  // whether VS Code started with this `code-workspace` file OR if VS Code
+  // opened the subdirectory directly.
+  "settings": {
+    "editor.formatOnSave": true,
+    // Files to exclude from the root "./" folder above.
+    "files.exclude": {
+      // "docs/": true,
+      "packages/": true,
+    },
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+      "*.cjs": "${capture}.*",
+      "*.cts": "${capture}.*",
+      "*.json": "${capture}.*",
+      "*.jsx": "${capture}.*",
+      ".env": ".env.*",
+      "*.js": "${capture}.*",
+      "*.mdx": "${capture}.*",
+      "*.ts": "${capture}.*",
+      "*.tsx": "${capture}.*",
+    },
+    "search.exclude": {
+      "package-lock.json": true,
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ]
+  },
+}

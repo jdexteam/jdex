@@ -1,0 +1,7 @@
+# See https://help.github.com/articles/ignoring-files/ for help.
+
+# Build
+lib/
+
+# Tests
+fixtures/new-project/

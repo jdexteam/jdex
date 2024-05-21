@@ -1,0 +1,50 @@
+{
+  "name": "@jdex/server",
+  "version": "1.0.0",
+  "description": "Jdex server library.",
+  "license": "MIT",
+  "homepage": "https://github.com/jdexteam/jdex",
+  "bugs": {
+    "url": "https://github.com/jdexteam/jdex/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdexteam/jdex.git"
+  },
+  "keywords": [
+    "jdex",
+    "json",
+    "database",
+    "db",
+    "filesystem",
+    "fs"
+  ],
+  "engines": {
+    "node": "^18.18.0 || >=20.0.0"
+  },
+  "type": "module",
+  "types": "./lib/index.d.ts",
+  "exports": "./lib/index.js",
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "run-s rm-build build-es",
+    "build-es": "tsx ../../scripts/esbuild-lib.ts",
+    "build-ts": "tsc",
+    "format": "prettier --write \"./**/*.{css,js,jsx,scss,ts}\"",
+    "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix",
+    "lint-ts": "tsc --emitDeclarationOnly false --noEmit",
+    "rm-build": "shx rm -rf lib/*"
+  },
+  "dependencies": {
+    "@metrichor/jmespath": "^0.3.1",
+    "@sinclair/typebox": "^0.32.14",
+    "fast-deep-equal": "^3.1.3",
+    "immutable-json-patch": "^6.0.1",
+    "jdex": "^1.0.0",
+    "nanoid": "^5.0.6"
+  }
+}
