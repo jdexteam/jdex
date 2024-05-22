@@ -121,6 +121,7 @@ export class FsDriver implements Driver {
       return p1 > p2 ? 1 : p2 > p1 ? -1 : 0;
     });
     const dirty = this._nodes.size > 0;
+    // CONSIDER: Currently, dirty is never true; _nodes are reset in close().
     const nodes = !dirty ? this._nodes : new Map<string, Node>();
     const rootNodes = !dirty ? this._rootNodes : new Set<Node>();
     const dirsByPath = new Map<string, Node>();
@@ -224,7 +225,8 @@ export class FsDriver implements Driver {
    * });
    */
   eachNode(visit: VisitNodeFn, within?: Node) {
-    const rootNodes = within?.children ?? this._rootNodes;
+    const rootNodes = !within ? this._rootNodes : within.children;
+    if (!rootNodes) return;
     let i = 0;
     for (const rootNode of rootNodes) {
       const stack = [{ node: rootNode, depth: 0, order: i }];
