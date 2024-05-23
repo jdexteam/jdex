@@ -106,14 +106,14 @@ export class Database<DB> {
   /** Prints the directory and file nodes with `console.log`. */
   async printDirectory() {
     const { logger } = this;
-    return this.transaction((files) => {
+    return this.transaction((trx) => {
       let count = 0;
       let maxDepth = 0;
       let maxItemsOneParent = 0;
       logger.log(
         "\n" + `[${new Date().toISOString()}] Nodes in ${this}` + "\n",
       );
-      files.eachNode((node, { depth, order }) => {
+      trx.eachNode((node, { depth, order }) => {
         count += 1;
         maxDepth = Math.max(maxDepth, depth);
         maxItemsOneParent = Math.max(maxItemsOneParent, order + 1);

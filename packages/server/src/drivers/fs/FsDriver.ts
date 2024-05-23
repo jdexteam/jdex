@@ -220,7 +220,7 @@ export class FsDriver implements Driver {
    * Traverses the tree in depth-first order calling the given callback for
    * each node.
    * @example
-   * db.eachNode((node, { depth, order }) => {
+   * driver.eachNode((node, { depth, order }) => {
    *   console.log(db.getNodePath(node), `item #${order} @ level ${depth}`);
    * });
    */

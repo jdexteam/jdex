@@ -22,7 +22,7 @@ export interface Node {
 }
 
 /**
- * A function called when visiting nodes, e.g. `Database.eachNode`.
+ * A function called when visiting nodes, e.g. `eachNode`.
  * @returns `true` to stop tree traversal. `false` to stop at `index.depth`.
  */
 export type VisitNodeFn = (
