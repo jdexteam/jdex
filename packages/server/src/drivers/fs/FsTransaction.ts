@@ -2,7 +2,13 @@ import Path from "node:path";
 // import FS from "node:fs";
 import FSP from "node:fs/promises";
 // Local
-import { Transaction, NodeVisitorFn } from "@/types";
+import {
+  MapNodeInfoDefault,
+  MapNodeInfoFn,
+  NodeInfo,
+  NodeVisitorFn,
+  Transaction,
+} from "@/types";
 import type { FsDriver } from "./FsDriver";
 import { isDirectoryNode } from "./types";
 
@@ -78,7 +84,7 @@ export default class FsTransaction implements Transaction {
    * @example
    * const { count } = await db.transaction(trx => {
    *   let count = 0;
-   *   trx.eachNode((node, { depth, order }) => {
+   *   trx.eachNode(null, (node, { depth, order }) => {
    *     console.log(node.id, node.path, `item #${order} @ level ${depth}`);
    *     count += 1;
    *   });
@@ -86,26 +92,37 @@ export default class FsTransaction implements Transaction {
    * });
    * console.log("NODES", count);
    */
-  eachNode(visit: NodeVisitorFn, withinId?: string) {
+  eachNode<T = NodeInfo>(
+    withinId: string | null,
+    visitor: NodeVisitorFn<T>,
+    mapNodeAs?: MapNodeInfoFn<T>,
+  ): void {
     const { driver } = this;
     const within = withinId ? driver.getNodeById(withinId) : undefined;
-    driver.eachNode((node, index) => {
+    const mapNode = mapNodeAs
+      ? mapNodeAs
+      : (MapNodeInfoDefault as MapNodeInfoFn<T>);
+    driver.eachNode<T>(within, visitor, (node) => {
       const {
         id,
         entry: { ctime, name, pId },
       } = node;
-      visit(
-        {
-          ctime,
-          id,
-          name,
-          pId,
-          isDir: isDirectoryNode(node),
-          path: driver.getNodePath(node),
-        },
-        index,
-      );
-    }, within);
+      const nodeInfo = {
+        ctime,
+        id,
+        name,
+        pId,
+        isDir: isDirectoryNode(node),
+        path: driver.getNodePath(node),
+      };
+      return mapNode(nodeInfo);
+    });
+  }
+  eachRootNode<T = NodeInfo>(
+    visitor: NodeVisitorFn<T>,
+    mapNodeAs?: MapNodeInfoFn<T>,
+  ): void {
+    return this.eachNode<T>(null, visitor, mapNodeAs);
   }
   /**
    * Returns the id used to refer to the given path. The path be relative to

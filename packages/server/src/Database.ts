@@ -113,22 +113,23 @@ export class Database<DB> {
       logger.log(
         "\n" + `[${new Date().toISOString()}] Nodes in ${this}` + "\n",
       );
-      trx.eachNode((node, { depth, order }) => {
+      console.time("Time to print directory");
+      trx.eachNode(null, (node, { depth, order }, siblings, children) => {
         count += 1;
         maxDepth = Math.max(maxDepth, depth);
         maxItemsOneParent = Math.max(maxItemsOneParent, order + 1);
         const indent = ": ".repeat(depth) + "|";
         logger.log(
           (indent + "- " + node.name + (node.isDir ? "/" : "")).padEnd(40) +
-            node.path.padEnd(80) +
-            `depth: ${depth}, ord: ${order}, id: ${node.id}`,
+            node.path.padEnd(60) +
+            `depth:${depth} ord:${order} childs:${children.length} sibs:${siblings.length - 1}  id:${node.id}`,
         );
-        // if (depth > 1) return false;
       });
       logger.log("");
       logger.log("            Total nodes:", count);
       logger.log("              Max depth:", maxDepth);
       logger.log("Max nodes single parent:", maxItemsOneParent);
+      console.timeEnd("Time to print directory");
       logger.log("");
     });
   }

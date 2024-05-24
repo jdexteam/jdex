@@ -7,7 +7,14 @@ import { glob } from "glob";
 // Local
 import type { Database } from "@/Database";
 import { CreateNodeOptions, Driver, Transaction } from "@/types";
-import { IdsFile, Node, VisitNodeFn, isDirectoryNode } from "./types";
+import {
+  IdsFile,
+  MapNodeDefault,
+  MapNodeFn,
+  Node,
+  VisitNodeFn,
+  isDirectoryNode,
+} from "./types";
 import FsTransaction from "./FsTransaction";
 
 /**
@@ -219,34 +226,73 @@ export class FsDriver implements Driver {
   /**
    * Traverses the tree in depth-first order calling the given callback for
    * each node.
+   * @param within The parent node's children to visit or `null` for root nodes.
+   * @param visitor The visitor callback to call for each node.
+   * @param mapNode An optional function to transform nodes for {@link visitor}.
    * @example
-   * driver.eachNode((node, { depth, order }) => {
+   * driver.eachNode(null, (node, { depth, order }, _siblings, _children) => {
    *   console.log(db.getNodePath(node), `item #${order} @ level ${depth}`);
    * });
    */
-  eachNode(visit: VisitNodeFn, within?: Node) {
+  eachNode<T = Node>(
+    within: Node | null | undefined,
+    visitor: VisitNodeFn<T>,
+    mapNode: MapNodeFn<T> = MapNodeDefault as MapNodeFn<T>,
+  ): void {
+    //
+    // The basic algorithm used here is documented at
+    // https://www.geeksforgeeks.org/preorder-traversal-of-n-ary-tree-without-recursion/
+    // Ours is slightly different since we have many root nodes, we allow the
+    // caller to specify an alternative parent to get root nodes (within) and
+    // we allow the caller to map the nodes to a different structure before
+    // calling visitor...
+    //
     const rootNodes = !within ? this._rootNodes : within.children;
     if (!rootNodes) return;
     let i = 0;
+    const rootSiblings = Array.from(rootNodes.values()).map(mapNode);
     for (const rootNode of rootNodes) {
-      const stack = [{ node: rootNode, depth: 0, order: i }];
+      const stack = [
+        {
+          /** The node mapped however the caller wants it. */
+          mapped: mapNode(rootNode),
+          /** The original node. */
+          node: rootNode,
+          /** Depth of the tree starting from the parent. */
+          depth: 0,
+          /** Order within the siblings. */
+          order: i,
+          /** Siblings of this node. */
+          siblings: rootSiblings,
+        },
+      ];
       let returned: boolean | void | undefined;
       while (stack.length > 0) {
-        const { node, depth, order } = stack.pop()!;
-        returned = visit(node, { depth, order });
+        const {
+          mapped,
+          // node,
+          node: { children: nodeChildren },
+          depth,
+          order,
+          siblings,
+        } = stack.pop()!;
+        const children = nodeChildren ? [...nodeChildren.values()] : undefined;
+        const childrenMapped = children?.map(mapNode) ?? [];
+        returned = visitor(mapped, { depth, order }, siblings, childrenMapped);
         if (returned === true) {
           return;
         } else if (returned === false) {
           continue;
         }
-        if (node.children) {
-          const children = [...node.children.values()];
+        if (children) {
           stack.push(
             ...children
               .map((it, j) => ({
+                mapped: mapNode(it),
                 node: it,
                 depth: depth + 1,
                 order: j,
+                siblings: childrenMapped,
               }))
               .reverse(),
           );
@@ -292,7 +338,7 @@ export class FsDriver implements Driver {
     const { length } = parts;
     const last = length - 1;
     let found: Node | undefined = undefined;
-    this.eachNode((node, { depth }) => {
+    this.eachNode(null, (node, { depth }) => {
       if (node.entry.name === parts[depth] && depth === last) {
         found = node;
         return true;
@@ -361,10 +407,10 @@ export class FsDriver implements Driver {
     // Delete cached path for this node and any children.
     _paths.delete(node);
     if (isDirectoryNode(node)) {
-      this.eachNode((node) => {
-        _nodes.delete(node.id);
-        _paths.delete(node);
-      }, node);
+      this.eachNode(node, (child) => {
+        _nodes.delete(child.id);
+        _paths.delete(child);
+      });
     }
     return found;
   }
@@ -373,9 +419,9 @@ export class FsDriver implements Driver {
     const { _paths } = this;
     _paths.delete(node);
     if (isDirectoryNode(node)) {
-      this.eachNode((child) => {
+      this.eachNode(node, (child) => {
         _paths.delete(child);
-      }, node);
+      });
     }
   }
 

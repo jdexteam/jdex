@@ -45,9 +45,17 @@ export interface Driver {
   open(): Promise<void>;
 }
 
-export type NodeVisitorFn = (
-  node: NodeInfo,
+export type MapNodeInfoFn<T = NodeInfo> = (node: NodeInfo) => T;
+
+export function MapNodeInfoDefault(node: NodeInfo): NodeInfo {
+  return node;
+}
+
+export type NodeVisitorFn<T = NodeInfo> = (
+  node: T,
   index: NodeVisitorIndex,
+  siblings: T[],
+  children: T[],
 ) => boolean | undefined | void;
 
 export interface NodeVisitorIndex {
@@ -71,7 +79,7 @@ export interface QueryInterface {
    * @example
    * const { count } = await db.transaction(trx => {
    *   let count = 0;
-   *   trx.eachNode((node, { depth, order }) => {
+   *   trx.eachNode(null, (node, { depth, order }) => {
    *     console.log(node.id, node.path, `item #${order} @ level ${depth}`);
    *     count += 1;
    *   });
@@ -79,7 +87,15 @@ export interface QueryInterface {
    * });
    * console.log("NODES", count);
    */
-  eachNode(visit: NodeVisitorFn): void;
+  eachNode<T = NodeInfo>(
+    withinId: string | null,
+    visitor: NodeVisitorFn<T>,
+    mapNodeAs?: MapNodeInfoFn<T>,
+  ): void;
+  eachRootNode<T = NodeInfo>(
+    visitor: NodeVisitorFn<T>,
+    mapNodeAs?: MapNodeInfoFn<T>,
+  ): void;
   /**
    * Returns the id used to refer to the given path. The path be relative to
    * the database root, e.g. `"my/folder/file.json"` or `"my/folder"`. Returns

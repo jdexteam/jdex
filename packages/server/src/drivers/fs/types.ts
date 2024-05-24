@@ -1,3 +1,7 @@
+/**
+ * Maps file path to node id. Represents the contents of the ids file used by
+ * the {@link FsDriver} to store ids generated for files in the db.
+ */
 export type IdsFile = Record<string, string>;
 
 /** A node in the Database represeting a Directory or JSON File. */
@@ -21,13 +25,21 @@ export interface Node {
   // futures?: NodeChange[];
 }
 
+export type MapNodeFn<T = Node> = (node: Node) => T;
+
+export function MapNodeDefault(node: Node): Node {
+  return node;
+}
+
 /**
  * A function called when visiting nodes, e.g. `eachNode`.
  * @returns `true` to stop tree traversal. `false` to stop at `index.depth`.
  */
-export type VisitNodeFn = (
-  node: Node,
+export type VisitNodeFn<T = Node> = (
+  node: T,
   index: { depth: number; order: number },
+  siblings: T[],
+  children: T[],
 ) => boolean | undefined | void;
 
 export function isDirectoryNode(
