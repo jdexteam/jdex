@@ -252,6 +252,7 @@ export class FsDriver implements Driver {
     let i = 0;
     const rootSiblings = Array.from(rootNodes.values()).map(mapNode);
     for (const rootNode of rootNodes) {
+      /** The stack for descending into the current root node... */
       const stack = [
         {
           /** The node mapped however the caller wants it. */
@@ -266,6 +267,7 @@ export class FsDriver implements Driver {
           siblings: rootSiblings,
         },
       ];
+      /** The value returned by calling the last visitor. */
       let returned: boolean | void | undefined;
       while (stack.length > 0) {
         const {
