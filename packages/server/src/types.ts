@@ -128,6 +128,21 @@ export type RemoveIndex<T> = {
         : K]: T[K];
 };
 
+export interface SchemaDetails<TSchema = any> {
+  files?: string[];
+  schema?: TSchema;
+}
+
+export interface SchemaInfo<DB, TSchema = any> extends SchemaDetails<TSchema> {
+  name: keyof DB & string;
+}
+
+export interface SchemaProvider<DB, TSchema = any> {
+  get(name: keyof DB & string): SchemaInfo<DB, TSchema> | undefined;
+  set(name: keyof DB & string, details: SchemaDetails<TSchema>): void;
+  setAll(byName: { [P in keyof DB]?: SchemaDetails<TSchema> }): void;
+}
+
 export interface Transaction extends QueryInterface {
   commit(): void;
   rollback(): void;

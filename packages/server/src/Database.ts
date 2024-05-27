@@ -1,9 +1,15 @@
 import Path from "node:path";
 import FS from "node:fs";
-import { TSchema } from "@sinclair/typebox";
 // Local
-import { Config, Driver, ILogger, TransactionCallback } from "@/types";
+import {
+  Config,
+  Driver,
+  ILogger,
+  SchemaProvider,
+  TransactionCallback,
+} from "@/types";
 import { FsDriver } from "@/drivers/fs";
+import { TypeboxSchemaProvider } from "@/providers/typebox";
 
 export interface DatabaseOptions extends Partial<Config> {
   /** Path to the config file. */
@@ -29,10 +35,11 @@ export class Database<DB> {
   public readonly driver: Driver;
   /** The common logger interface of the configured implementation. */
   public readonly logger: ILogger;
+  /** Access to schemas. */
+  public readonly schemas: SchemaProvider<DB>;
 
   /** `true` if {@link Database.open}, `false` if {@link Database.close}d */
   private _opened = false;
-  private _schemas = new Map<keyof DB & string, TSchema>();
   private _transactionQueue: Array<TransactionRunner> = [];
   private _transactionsRunning = false;
 
@@ -76,6 +83,7 @@ export class Database<DB> {
     this.configFile = configFile;
     this.path = path;
     this.logger = console;
+    this.schemas = new TypeboxSchemaProvider<DB>();
     this.driver = new FsDriver({
       db: this,
     });
@@ -133,24 +141,6 @@ export class Database<DB> {
       logger.log("");
     });
   }
-
-  // #region Schemas
-  addSchema<ST extends keyof DB & string>(name: ST, schema: TSchema) {
-    const { _schemas } = this;
-    _schemas.set(name, schema);
-    return this;
-  }
-  addSchemas(schemas: { [P in keyof DB]?: TSchema }) {
-    const { _schemas } = this;
-    for (const name in schemas) {
-      const schema = schemas[name];
-      if (schema) {
-        _schemas.set(name as any, schema);
-      }
-    }
-    return this;
-  }
-  // #endregion
 
   // #region Transactions
 
