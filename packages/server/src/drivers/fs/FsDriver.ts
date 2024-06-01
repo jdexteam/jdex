@@ -163,6 +163,11 @@ export class FsDriver implements Driver {
         node.entry.pId = parentNode.id;
         parentNode.children!.add(node);
       }
+      if (!isDirectory) {
+        const jsonText = (await FSP.readFile(srcNode.fullpath())).toString();
+        const jsonData = JSON.parse(jsonText);
+        node.content = jsonData;
+      }
     }
     // Save state.
     this._nodes = nodes;
@@ -347,6 +352,11 @@ export class FsDriver implements Driver {
       }
     });
     return found;
+  }
+
+  getNodeContent(id: string): any {
+    const node = this._nodes.get(id);
+    return node?.content;
   }
 
   getNodeDepth(node: Node) {

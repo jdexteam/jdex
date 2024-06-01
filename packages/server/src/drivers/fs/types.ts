@@ -20,7 +20,7 @@ export interface Node {
     /** Change time Unix timestamp, e.g. milliseconds since UTC 1970-01-01. */
     ctime: number;
   };
-  // content?: unknown;
+  content?: unknown;
   // history?: NodeChange[];
   // futures?: NodeChange[];
 }

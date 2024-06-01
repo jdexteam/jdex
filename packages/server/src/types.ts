@@ -96,6 +96,7 @@ export interface QueryInterface {
     visitor: NodeVisitorFn<T>,
     mapNodeAs?: MapNodeInfoFn<T>,
   ): void;
+  findModels(args: any): any[];
   /**
    * Returns the id used to refer to the given path. The path be relative to
    * the database root, e.g. `"my/folder/file.json"` or `"my/folder"`. Returns

@@ -35,4 +35,21 @@ export function DatabaseUnitTests<DB = any>(dbOrPath: string | Database<DB>) {
     });
     expect(err).toBeUndefined();
   });
+  test("Find databases.", async () => {
+    let err: any = undefined;
+    await openDb(dbOrPath, async (db) => {
+      await db.transaction((trx) => {
+        const dbs = trx.findModels({
+          type: "db",
+        });
+        if (dbs.length > 0) {
+          console.log("Found database(s)");
+          console.dir(dbs, { depth: null });
+        }
+      });
+    }).catch((ex) => {
+      err = ex;
+    });
+    expect(err).toBeUndefined();
+  });
 }

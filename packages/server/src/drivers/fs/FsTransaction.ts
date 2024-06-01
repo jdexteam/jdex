@@ -124,6 +124,18 @@ export default class FsTransaction implements Transaction {
   ): void {
     return this.eachNode<T>(null, visitor, mapNodeAs);
   }
+  findModels(args: any): any[] {
+    const results: any[] = [];
+    this.eachNode(null, (node, i, sibs, children) => {
+      if (!node.isDir && node.name.endsWith(".db.json")) {
+        results.push({
+          node,
+          content: this.driver.getNodeContent(node.id),
+        });
+      }
+    });
+    return results;
+  }
   /**
    * Returns the id used to refer to the given path. The path be relative to
    * the database root, e.g. `"my/folder/file.json"` or `"my/folder"`.
